@@ -12,7 +12,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  background: linear-gradient(120deg, #ffffff 0%, #fbf1e2 100%);
+  background: linear-gradient(120deg, #ffffff 0%, #ffe8d6 100%);
   border: 1px solid var(--border);
   color: var(--ink);
   padding: 28px 28px;
@@ -248,7 +248,7 @@
   position: absolute;
   top: 8px;
   left: 8px;
-  background: var(--primary);
+  background: var(--danger);
   color: #fff;
   border-radius: 6px;
   padding: 4px 8px;
