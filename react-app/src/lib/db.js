@@ -101,6 +101,34 @@ export function save(data) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
 }
 
+/* Shared-store sync (Vercel KV via /api/state). Falls back to null/false
+   when the API is unavailable (e.g. local dev), leaving localStorage as the store. */
+export async function apiGet() {
+  try {
+    const r = await fetch("/api/state", { cache: "no-store" });
+    if (!r.ok) return null;
+    const json = await r.json();
+    if (!json.data) return null;
+    migrate(json.data);
+    return json.data;
+  } catch {
+    return null;
+  }
+}
+
+export async function apiSave(data) {
+  try {
+    const r = await fetch("/api/state", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ data }),
+    });
+    return r.ok;
+  } catch {
+    return false;
+  }
+}
+
 /* Total ingredient requirement for a set of order items. */
 export function ingredientNeeds(data, items) {
   const foods = data.foods || [];
