@@ -1,0 +1,49 @@
+@media (max-width: 640px) {
+  .app-shell,
+  .dashboard-shell {
+    padding: 14px;
+  }
+
+  .stack-form {
+    flex-direction: column;
+  }
+
+  .order-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .order-row .order-meta {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .menu-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .menu-table th,
+  .menu-table td {
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .menu-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
