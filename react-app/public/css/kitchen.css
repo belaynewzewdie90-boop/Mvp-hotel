@@ -63,6 +63,26 @@
   color: var(--success);
 }
 
+.kitchen-col-head .col-icon.served {
+  background: var(--accent-bg);
+  color: var(--accent-ink);
+}
+
+.served-strip {
+  margin-top: 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow);
+}
+
+.served-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+
 .kitchen-card {
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -79,6 +99,45 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.kitchen-card .kc-head-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kitchen-card .kc-more {
+  padding: 4px;
+  border-radius: 8px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  line-height: 0;
+}
+
+.kitchen-card .kc-more .icon {
+  width: 16px;
+  height: 16px;
+}
+
+.kitchen-card.served {
+  opacity: 0.92;
+  margin-bottom: 0;
+}
+
+.kitchen-card .served-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  background: var(--accent-bg);
+  color: var(--accent-ink);
+  font-weight: 700;
+  font-size: 0.85rem;
 }
 
 .kitchen-card .kc-table {

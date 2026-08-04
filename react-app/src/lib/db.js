@@ -193,3 +193,39 @@ export function consumeOrder(data, order) {
   data.inventory = inventory;
   return { shortages };
 }
+
+/* Return ingredients to inventory when an order is cancelled after it was
+   started (Preparing/Ready). Mutates the passed `data` object. */
+export function refundOrder(data, order) {
+  const needs = ingredientNeeds(data, order.items);
+  if (!Object.keys(needs).length) return;
+
+  const inventory = data.inventory || [];
+  Object.entries(needs).forEach(([name, qty]) => {
+    const stock = inventory.find((i) => i.name === name);
+    if (stock) {
+      stock.quantity += qty;
+    } else {
+      inventory.push({ id: Date.now(), name, quantity: qty });
+    }
+  });
+
+  data.consumptionLog = data.consumptionLog || [];
+  data.consumptionLog.push({
+    id: Date.now(),
+    orderId: order.id,
+    table: order.table,
+    items: (order.items || [])
+      .map((i) => `${i.name} × ${i.quantity}`)
+      .join(", "),
+    refunded: Object.entries(needs)
+      .map(([name, qty]) => `${name} ×${qty}`)
+      .join(", "),
+    createdAt: new Date().toISOString(),
+  });
+  if (data.consumptionLog.length > 200) {
+    data.consumptionLog = data.consumptionLog.slice(-200);
+  }
+
+  data.inventory = inventory;
+}

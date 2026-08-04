@@ -243,7 +243,7 @@ function OrderManagement() {
   const { data, update } = useDb();
   const { toast, confirm } = useUi();
   const orders = (data.orders || [])
-    .filter((o) => o.status !== "Served")
+    .filter((o) => o.status !== "Served" && o.status !== "Cancelled")
     .slice()
     .reverse();
 
