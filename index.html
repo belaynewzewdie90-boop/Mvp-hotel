@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grand Plaza Hotel | Table Ordering</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/customer.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body>
+    <div class="app-shell customer-page">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Welcome to</p>
+          <h1>Grand Plaza Hotel</h1>
+          <p class="subtitle">Scan, browse, and order from your table instantly.</p>
+        </div>
+        <div class="hero-card">
+          <small>Your table</small>
+          <h2 id="tableNumber">1</h2>
+          <img id="tableQr" class="table-qr" alt="QR code for this table" />
+          <small class="qr-hint">Scan to open your table</small>
+          <a href="login.html">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+            Staff login
+          </a>
+          <span aria-hidden="true" style="color:var(--faint)">·</span>
+          <a href="track.html">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Track order
+          </a>
+        </div>
+      </header>
+
+      <section id="trackPanel" class="card track-panel hidden">
+        <div class="panel-head">
+          <h2>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            Track Your Order
+          </h2>
+          <span style="display:inline-flex;align-items:center;gap:8px">
+            <span id="trackBadge"></span>
+            <a id="trackFullLink" class="btn btn-sm btn-ghost" href="track.html">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Full tracker
+            </a>
+          </span>
+        </div>
+        <div id="trackOrderInfo"></div>
+        <div id="trackSteps" class="track-steps"></div>
+      </section>
+
+      <main class="customer-layout">
+        <section class="menu-panel card">
+          <div class="section-head">
+            <h2>Menu</h2>
+            <div class="search-box">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input id="searchInput" type="text" placeholder="Search dishes" />
+            </div>
+          </div>
+          <div id="chipRow" class="chip-row"></div>
+          <div id="menuGrid" class="menu-grid"></div>
+        </section>
+
+        <aside class="cart-panel card">
+          <div class="section-head">
+            <h2>Your Order</h2>
+            <span id="cartCount" class="badge badge-Pending hidden"></span>
+          </div>
+          <div id="cartItems" class="cart-items"></div>
+          <div class="cart-summary">
+            <div class="summary-row total">
+              <span>Total</span>
+              <strong id="total">0.00 SAR</strong>
+            </div>
+            <button id="placeOrderBtn" class="btn btn-primary" disabled>Place Order</button>
+          </div>
+        </aside>
+      </main>
+
+      <section id="myOrdersPanel" class="card my-orders-panel hidden">
+        <div class="panel-head">
+          <h2>
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+            My Orders
+          </h2>
+          <span id="myOrdersCount" class="muted"></span>
+        </div>
+        <div id="myOrdersList" class="list"></div>
+      </section>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/qrcode.js"></script>
+    <script src="js/customer/qr.js"></script>
+    <script src="js/customer/cart.js"></script>
+    <script src="js/customer/menu.js"></script>
+    <script src="js/customer/order.js"></script>
+    <script src="js/customer/tracking.js"></script>
+    <script src="js/customer/history.js"></script>
+  </body>
+</html>

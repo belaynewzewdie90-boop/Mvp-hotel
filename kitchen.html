@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kitchen Dashboard | Grand Plaza</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/kitchen.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-mark">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 13.87A4 4 0 0 1 7.41 6a5.11 5.11 0 0 1 1.05-1.54 5 5 0 0 1 7.08 0A5.11 5.11 0 0 1 16.59 6 4 4 0 0 1 18 13.87V21H6z"/><line x1="6" y1="17" x2="18" y2="17"/></svg>
+          </div>
+          <div>
+            <h1>Grand Plaza</h1>
+            <small>Kitchen</small>
+          </div>
+        </div>
+        <nav>
+          <a href="admin.html">Admin</a>
+          <a class="active" href="kitchen.html">Kitchen</a>
+          <a href="store.html">Store</a>
+          <a href="index.html">Customer Menu</a>
+        </nav>
+        <div class="sidebar-foot">
+          <a class="btn btn-ghost" href="index.html">← Back to site</a>
+        </div>
+      </aside>
+
+      <main class="dashboard-content">
+        <div>
+          <h1 class="page-title">Kitchen Board</h1>
+          <p class="page-sub">Orders update live as they arrive</p>
+        </div>
+
+        <div id="kitchenBoard" class="kitchen-board"></div>
+      </main>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/kitchen/orderStatus.js"></script>
+    <script src="js/kitchen/kitchenDashboard.js"></script>
+  </body>
+</html>

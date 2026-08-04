@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Classic Burger",
+    "price": 45,
+    "category": "Main",
+    "image": "assets/images/burger.svg"
+  },
+  {
+    "id": 2,
+    "name": "Margherita Pizza",
+    "price": 60,
+    "category": "Main",
+    "image": "assets/images/pizza.svg"
+  },
+  {
+    "id": 3,
+    "name": "Fresh Lemonade",
+    "price": 20,
+    "category": "Drinks",
+    "image": "assets/images/drinks.svg"
+  }
+]

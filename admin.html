@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard | Grand Plaza</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/admin.css" />
+    <link rel="stylesheet" href="css/responsive.css" />
+  </head>
+  <body>
+    <div class="dashboard-shell">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-mark">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          </div>
+          <div>
+            <h1>Grand Plaza</h1>
+            <small>Admin Panel</small>
+          </div>
+        </div>
+        <nav>
+          <a class="active" href="admin.html">Dashboard</a>
+          <a href="kitchen.html">Kitchen</a>
+          <a href="store.html">Store</a>
+          <a href="index.html">Customer Menu</a>
+        </nav>
+        <div class="sidebar-foot">
+          <a class="btn btn-ghost" href="index.html">← Back to site</a>
+        </div>
+      </aside>
+
+      <main class="dashboard-content">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub">Overview of today's activity</p>
+        </div>
+
+        <section class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon green">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            </div>
+            <div>
+              <h3>Today's Sales</h3>
+              <p id="todaySales">0.00 SAR</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon amber">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <h3>Pending Orders</h3>
+              <p id="pendingOrders">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon blue">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </div>
+            <div>
+              <h3>Menu Items</h3>
+              <p id="menuCount">0</p>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon red">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1z"/><line x1="8" y1="7" x2="16" y2="7"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="12" y2="15"/></svg>
+            </div>
+            <div>
+              <h3>Total Orders</h3>
+              <p id="totalOrders">0</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel admin-panel">
+          <div class="panel-head">
+            <h2>Menu Management</h2>
+            <span class="muted" id="menuFormHint">Add a new dish</span>
+          </div>
+          <form id="menuForm" class="stack-form">
+            <input id="foodName" class="input" placeholder="Food name" required />
+            <input id="foodPrice" class="input" type="number" min="0" step="0.01" placeholder="Price (SAR)" required />
+            <input id="foodCategory" class="input" placeholder="Category (e.g. Main)" required />
+            <input id="foodIngredients" class="input" placeholder="Ingredients (e.g. Bread Buns:1, Cheese:1)" />
+            <input id="foodImage" class="input" placeholder="Image URL (optional)" />
+            <button type="submit" class="btn btn-primary" id="menuSubmitBtn">Add Item</button>
+          </form>
+          <div id="menuList"></div>
+        </section>
+
+        <section class="panel admin-panel">
+          <div class="panel-head">
+            <h2>Order Management</h2>
+          </div>
+          <div id="orderList" class="list"></div>
+        </section>
+
+        <section class="panel admin-panel">
+          <div class="panel-head">
+            <h2>Order History</h2>
+          </div>
+          <div class="hist-filters">
+            <div class="search-box" style="flex:1">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input id="histSearch" class="input" type="text" placeholder="Search table or order #" />
+            </div>
+            <select id="histStatus" class="input">
+              <option value="">All statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Preparing">Preparing</option>
+              <option value="Ready">Ready</option>
+              <option value="Served">Served</option>
+            </select>
+          </div>
+          <div id="histSummary" class="hist-summary"></div>
+          <div id="histList" class="list"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="js/database.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/admin/dashboard.js"></script>
+    <script src="js/admin/menuManagement.js"></script>
+    <script src="js/admin/orderManagement.js"></script>
+    <script src="js/admin/orderHistory.js"></script>
+  </body>
+</html>
