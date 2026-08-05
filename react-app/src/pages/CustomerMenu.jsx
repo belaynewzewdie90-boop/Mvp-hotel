@@ -5,6 +5,7 @@ import { useUi } from "../context/UiContext";
 import Icon from "../components/Icon";
 import StatusBadge from "../components/StatusBadge";
 import { formatSAR, itemsText, resolveImage, timeAgo } from "../lib/helpers";
+import { getSession, ordersForSession } from "../lib/session";
 import qrcode from "../lib/qrcode";
 
 const STEPS = ["Pending", "Preparing", "Ready", "Served"];
@@ -14,6 +15,8 @@ const STEP_LABELS = {
   Ready: "Ready",
   Served: "Served",
 };
+
+const SHADOW = "shadow-[0_6px_16px_-6px_rgba(17,17,17,0.12)]";
 
 function useTableQr(table) {
   const [src, setSrc] = useState("");
@@ -30,49 +33,77 @@ function useTableQr(table) {
 function Hero({ table }) {
   const qrSrc = useTableQr(table);
   return (
-    <header className="hero">
-      <div>
-        <p className="eyebrow">Welcome to</p>
-        <h1>Grand Plaza Hotel</h1>
-        <p className="subtitle">Scan, browse, and order from your table instantly.</p>
+    <header className="relative flex flex-col items-center gap-5 overflow-hidden rounded-2xl border border-gray-200 bg-gradient-to-tr from-white via-white to-orange-100 px-7 py-7 text-center shadow-[0_6px_16px_-6px_rgba(17,17,17,0.12)] sm:flex-row sm:justify-between sm:text-left">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -left-[50px] -top-[70px] h-[230px] w-[230px] bg-neutral-200/75"
+        style={{ clipPath: "polygon(0 0, 100% 28%, 42% 100%)" }}
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-[80px] -right-[60px] h-[260px] w-[260px] bg-neutral-200/75"
+        style={{ clipPath: "polygon(50% 0, 100% 100%, 0 100%)" }}
+      />
+      <div className="relative z-10">
+        <p className="mb-1.5 text-xs font-bold uppercase tracking-[0.22em] text-brand">
+          Welcome to
+        </p>
+        <h1 className="text-3xl font-bold tracking-tight text-ink">
+          Grand Plaza Hotel
+        </h1>
+        <p className="mt-1.5 text-muted">
+          Scan, browse, and order from your table instantly.
+        </p>
       </div>
-      <div className="hero-card">
-        <small>Your table</small>
-        <h2>{table}</h2>
+      <div className="relative z-10 rounded-2xl border border-gray-200 bg-white px-6 py-3.5 text-center shadow-sm">
+        <small className="text-[0.7rem] font-bold uppercase tracking-[0.12em] text-muted">
+          Your table
+        </small>
+        <h2 className="my-0.5 text-4xl font-extrabold text-brand">{table}</h2>
         {qrSrc ? (
           <img
-            className="table-qr"
+            className="mx-auto mt-2.5 block h-[132px] w-[132px] rounded-[10px] border border-gray-200 bg-white p-2 shadow-sm"
             src={qrSrc}
             alt={`QR code for table ${table}`}
           />
         ) : (
-          <div className="table-qr" aria-hidden="true" />
+          <div
+            className="mx-auto mt-2.5 h-[132px] w-[132px] rounded-[10px] border border-gray-200 bg-white p-2 shadow-sm"
+            aria-hidden="true"
+          />
         )}
-        <small className="qr-hint">Scan to open your table</small>
-        <Link to="/login">
-          <Icon name="lock" />
-          Staff login
-        </Link>
-        <span aria-hidden="true" style={{ color: "var(--faint)" }}>
-          ·
-        </span>
-        <Link to={`/track?table=${table}`}>
-          <Icon name="zap" />
-          Track order
-        </Link>
+        <small className="mt-2 block text-[0.68rem] font-bold uppercase tracking-[0.12em] text-muted">
+          Scan to open your table
+        </small>
+        <div className="mt-2 flex items-center justify-center gap-1.5 text-[0.78rem] font-semibold text-muted">
+          <Link to="/login" className="inline-flex items-center gap-1.5 hover:text-brand">
+            <Icon name="lock" className="h-3.5 w-3.5" />
+            Staff login
+          </Link>
+          <span aria-hidden="true" className="text-faint">
+            ·
+          </span>
+          <Link
+            to={`/track?table=${table}`}
+            className="inline-flex items-center gap-1.5 hover:text-brand"
+          >
+            <Icon name="zap" className="h-3.5 w-3.5" />
+            Track order
+          </Link>
+        </div>
       </div>
     </header>
   );
 }
 
-function TrackPanel({ table }) {
+function TrackPanel({ table, sessionId }) {
   const { data } = useDb();
   const latest = useMemo(() => {
-    const orders = (data.orders || [])
-      .filter((o) => String(o.table) === String(table))
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const orders = ordersForSession(data.orders, table, sessionId).sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+    );
     return orders[0] || null;
-  }, [data.orders, table]);
+  }, [data.orders, table, sessionId]);
 
   if (!latest) return null;
 
@@ -81,50 +112,80 @@ function TrackPanel({ table }) {
   const justPlaced = latest.status === "Pending";
 
   return (
-    <section className="card track-panel">
-      <div className="panel-head">
-        <h2>
-          <Icon name="zap" />
+    <section
+      className={`mt-5 animate-track-in rounded-2xl border border-gray-200 bg-white p-5 ${SHADOW}`}
+    >
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-[1.05rem] font-bold">
+          <Icon name="zap" className="h-4 w-4" />
           Track Your Order
         </h2>
-        <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+        <span className="flex items-center gap-2">
           <StatusBadge status={latest.status} />
-          <Link className="btn btn-sm btn-ghost" to={`/track?table=${table}`}>
-            <Icon name="external" />
-            Full tracker
+          <Link
+            className="rounded-lg px-3 py-1.5 text-[0.85rem] font-semibold text-muted hover:bg-surface-2 hover:text-ink"
+            to={`/track?table=${table}`}
+          >
+            <span className="inline-flex items-center gap-1.5">
+              <Icon name="external" className="h-3.5 w-3.5" />
+              Full tracker
+            </span>
           </Link>
         </span>
       </div>
-      <div className="track-confirm" style={justPlaced ? undefined : { display: "none" }}>
-        <Icon name="check" />
-        <strong>Order confirmed — order #{latest.id}</strong>
-      </div>
-      <div className="track-ref">
+      {justPlaced && (
+        <div className="mb-3 flex items-center gap-2 rounded-[10px] bg-green-100 px-3.5 py-2.5 text-[0.92rem] font-bold text-green-900">
+          <Icon name="check" className="h-4 w-4 text-green-600" />
+          Order confirmed — order #{latest.id}
+        </div>
+      )}
+      <div className="mb-2.5 flex items-center justify-between text-[0.8rem] font-semibold text-faint">
         <span>Order #{latest.id}</span>
         <span>Placed {timeAgo(latest.createdAt)}</span>
       </div>
-      <div className="track-items">{itemsText(latest.items, " · ")}</div>
-      <div className="track-meta">
-        <span className="track-table">Table {latest.table}</span>
+      <div className="mb-2 text-[0.95rem] font-semibold">
+        {itemsText(latest.items, " · ")}
+      </div>
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <span className="text-[0.9rem] text-muted">Table {latest.table}</span>
         <strong>{formatSAR(latest.total)}</strong>
       </div>
-      <p className="track-note">
+      <p className="mb-4.5 text-[0.88rem] text-muted">
         {done
           ? "Order complete — enjoy your meal!"
           : "Order received! The kitchen has been notified. We'll update you here as your order progresses."}
       </p>
-      <div className="track-steps">
+      <div className="flex items-start gap-1.5">
         {STEPS.map((step, i) => (
-          <div key={step} style={{ display: "contents" }}>
-            <div
-              className={`track-step ${i <= currentIdx ? "done" : ""} ${i === currentIdx ? "current" : ""}`}
-            >
-              <div className="track-dot" />
-              <span>{STEP_LABELS[step]}</span>
+          <div
+            key={step}
+            className={`flex flex-col items-center gap-1.5 text-center ${i > 0 ? "flex-1" : ""}`}
+          >
+            <div className="flex w-full items-center">
+              <span
+                className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${
+                  i <= currentIdx
+                    ? "border-brand bg-brand text-white shadow-[0_0_0_4px_rgba(251,153,28,0.25)]"
+                    : "border-gray-300 bg-surface-2"
+                } ${i === currentIdx ? "border-brand bg-white" : ""}`}
+              >
+                {i < currentIdx && <Icon name="check" className="h-3 w-3" />}
+              </span>
+              {i < STEPS.length - 1 && (
+                <div
+                  className={`h-[3px] flex-1 rounded-full ${
+                    i < currentIdx ? "bg-brand" : "bg-gray-200"
+                  }`}
+                />
+              )}
             </div>
-            {i < STEPS.length - 1 && (
-              <div className={`track-line ${i < currentIdx ? "done" : ""}`} />
-            )}
+            <span
+              className={`text-[0.72rem] font-bold uppercase tracking-[0.05em] ${
+                i <= currentIdx ? "text-brand-ink" : "text-faint"
+              }`}
+            >
+              {STEP_LABELS[step]}
+            </span>
           </div>
         ))}
       </div>
@@ -139,20 +200,27 @@ function FoodCard({ food, qty, onAdd, onChangeQty }) {
       : 0;
   const ribbon =
     discount > 0 ? (
-      <span className="food-ribbon">-{discount}%</span>
+      <span className="absolute left-2 top-2 z-10 rounded-md bg-red-600 px-2 py-1 text-[0.72rem] font-bold text-white">
+        -{discount}%
+      </span>
     ) : food.new ? (
-      <span className="food-ribbon new">New</span>
+      <span className="absolute left-2 top-2 z-10 rounded-md bg-blue-600 px-2 py-1 text-[0.72rem] font-bold text-white">
+        New
+      </span>
     ) : null;
   const oldPrice =
     food.oldPrice > food.price ? (
-      <span className="price-old">{food.oldPrice} SAR</span>
+      <span className="ml-1.5 text-[0.78rem] font-medium text-faint line-through">
+        {food.oldPrice} SAR
+      </span>
     ) : null;
 
   return (
-    <article className="food-card">
-      <div className="food-media">
+    <article className="group flex flex-col rounded-2xl border border-gray-200 bg-white p-1.5 transition duration-200 hover:-translate-y-[3px] hover:border-gray-300 hover:shadow-[0_6px_16px_-6px_rgba(17,17,17,0.12)]">
+      <div className="relative flex aspect-square items-center justify-center rounded-xl bg-peach p-4">
         {ribbon}
         <img
+          className="h-full w-full object-contain transition duration-300 group-hover:scale-105"
           src={resolveImage(food.image)}
           alt={food.name}
           onError={(e) => {
@@ -160,27 +228,44 @@ function FoodCard({ food, qty, onAdd, onChangeQty }) {
           }}
         />
       </div>
-      <div className="food-body">
+      <div className="flex flex-1 flex-col gap-1.5 p-3 pb-2.5">
         <div>
-          <h3>{food.name}</h3>
-          <span className="food-cat">{food.category}</span>
+          <h3 className="line-clamp-2 min-h-[2.6em] text-[0.95rem] font-semibold leading-snug text-ink">
+            {food.name}
+          </h3>
+          <span className="text-[0.72rem] font-semibold uppercase tracking-[0.06em] text-faint">
+            {food.category}
+          </span>
         </div>
-        <div className="food-foot">
-          <span className="price">
+        <div className="mt-auto flex items-center justify-between gap-2">
+          <span className="text-[1.02rem] font-bold text-brand">
             {food.price} SAR{oldPrice}
           </span>
           {qty ? (
-            <div className="stepper">
-              <button onClick={() => onChangeQty(food.id, -1)} aria-label="Decrease">
+            <div className="inline-flex items-center gap-0.5 rounded-[10px] bg-brand-soft p-[3px]">
+              <button
+                onClick={() => onChangeQty(food.id, -1)}
+                aria-label="Decrease"
+                className="grid h-7 w-7 place-items-center rounded-lg bg-white text-[1.05rem] font-extrabold leading-none text-brand-strong shadow-sm transition active:scale-90"
+              >
                 −
               </button>
-              <span className="stepper-val">{qty}</span>
-              <button onClick={() => onChangeQty(food.id, 1)} aria-label="Increase">
+              <span className="min-w-[30px] text-center text-[0.95rem] font-extrabold text-brand-ink">
+                {qty}
+              </span>
+              <button
+                onClick={() => onChangeQty(food.id, 1)}
+                aria-label="Increase"
+                className="grid h-7 w-7 place-items-center rounded-lg bg-white text-[1.05rem] font-extrabold leading-none text-brand-strong shadow-sm transition active:scale-90"
+              >
                 +
               </button>
             </div>
           ) : (
-            <button className="btn btn-cart btn-sm" onClick={() => onAdd(food.id)}>
+            <button
+              className="rounded-lg bg-blue-50 px-3 py-1.5 text-[0.85rem] font-semibold text-blue-600 transition hover:bg-blue-100"
+              onClick={() => onAdd(food.id)}
+            >
               Add
             </button>
           )}
@@ -207,31 +292,41 @@ function MenuPanel({ cart, onAdd, onChangeQty }) {
   );
 
   return (
-    <section className="menu-panel card">
-      <div className="section-head">
-        <h2>Menu</h2>
-        <div className="search-box">
-          <Icon name="search" />
+    <section
+      className={`rounded-2xl border border-gray-200 bg-white p-5 ${SHADOW}`}
+    >
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-[1.1rem] font-bold">Menu</h2>
+        <div className="relative w-full max-w-[240px] max-sm:w-full">
+          <Icon
+            name="search"
+            className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-faint"
+          />
           <input
             type="text"
             placeholder="Search dishes"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
+            className="w-full rounded-[10px] border border-gray-300 bg-surface-2 py-2.5 pl-9 pr-3 text-ink transition focus:border-brand focus:bg-white focus:shadow-[0_0_0_3px_rgba(251,153,28,0.18)] focus:outline-none"
           />
         </div>
       </div>
-      <div className="chip-row">
+      <div className="mb-4 flex flex-wrap gap-2">
         {categories.map((cat) => (
           <button
             key={cat}
-            className={`chip ${cat === activeCategory ? "active" : ""}`}
+            className={`rounded-full border px-4 py-1.5 text-[0.85rem] font-semibold transition ${
+              cat === activeCategory
+                ? "border-brand bg-brand text-white"
+                : "border-gray-200 bg-white text-muted hover:border-brand hover:bg-brand-soft hover:text-brand"
+            }`}
             onClick={() => setActiveCategory(cat)}
           >
             {cat}
           </button>
         ))}
       </div>
-      <div className="menu-grid">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-4">
         {filtered.length ? (
           filtered.map((food) => (
             <FoodCard
@@ -243,9 +338,9 @@ function MenuPanel({ cart, onAdd, onChangeQty }) {
             />
           ))
         ) : (
-          <div className="empty-state" style={{ gridColumn: "1 / -1" }}>
-            <Icon name="menu" />
-            <p>No menu items found.</p>
+          <div className="col-span-full flex flex-col items-center gap-2 py-9 text-center text-faint">
+            <Icon name="menu" className="h-10 w-10 opacity-60" />
+            <p className="text-[0.95rem]">No menu items found.</p>
           </div>
         )}
       </div>
@@ -258,21 +353,27 @@ function CartPanel({ cart, onAdd, onChangeQty, onRemove, onPlaceOrder }) {
   const total = cart.reduce((s, i) => s + i.price * i.quantity, 0);
 
   return (
-    <aside className="cart-panel card">
-      <div className="section-head">
-        <h2>Your Order</h2>
+    <aside
+      className={`flex max-h-[calc(100vh-40px)] flex-col rounded-2xl border border-gray-200 bg-white p-5 lg:sticky lg:top-5 ${SHADOW}`}
+    >
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="text-[1.1rem] font-bold">Your Order</h2>
         {count > 0 && (
-          <span id="cartCount" className="badge badge-Pending">
+          <span className="rounded-full bg-brand-soft px-2.5 py-1 text-xs font-bold text-brand-ink">
             {count} item{count > 1 ? "s" : ""}
           </span>
         )}
       </div>
-      <div className="cart-items">
+      <div className="flex min-h-[60px] flex-1 flex-col gap-1 overflow-y-auto">
         {cart.length ? (
           cart.map((item) => (
-            <div className="cart-item" key={item.id}>
-              <div className="ci-thumb">
+            <div
+              className="flex items-center justify-between gap-2.5 border-b border-gray-200 px-1 py-2.5"
+              key={item.id}
+            >
+              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-peach p-2">
                 <img
+                  className="h-full w-full object-contain"
                   src={resolveImage(item.image)}
                   alt={item.name}
                   onError={(e) => {
@@ -280,36 +381,50 @@ function CartPanel({ cart, onAdd, onChangeQty, onRemove, onPlaceOrder }) {
                   }}
                 />
               </div>
-              <div className="ci-main">
-                <div className="ci-name">{item.name}</div>
-                <div className="ci-price">{item.price} SAR each</div>
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-[0.92rem] font-semibold">
+                  {item.name}
+                </div>
+                <div className="text-[0.8rem] text-muted">
+                  {item.price} SAR each
+                </div>
               </div>
-              <div className="mini-stepper">
-                <button onClick={() => onChangeQty(item.id, -1)} aria-label="Decrease">
+              <div className="inline-flex items-center overflow-hidden rounded-lg border border-gray-300">
+                <button
+                  onClick={() => onChangeQty(item.id, -1)}
+                  aria-label="Decrease"
+                  className="h-[26px] w-[26px] bg-surface-2 font-bold text-muted transition hover:bg-brand-soft hover:text-brand-strong"
+                >
                   −
                 </button>
-                <span className="ms-val">{item.quantity}</span>
-                <button onClick={() => onChangeQty(item.id, 1)} aria-label="Increase">
+                <span className="min-w-[30px] text-center text-[0.85rem] font-bold">
+                  {item.quantity}
+                </span>
+                <button
+                  onClick={() => onChangeQty(item.id, 1)}
+                  aria-label="Increase"
+                  className="h-[26px] w-[26px] bg-surface-2 font-bold text-muted transition hover:bg-brand-soft hover:text-brand-strong"
+                >
                   +
                 </button>
               </div>
-              <strong className="ci-total">
+              <strong className="whitespace-nowrap text-[0.95rem] font-bold text-brand">
                 {formatSAR(item.price * item.quantity)}
               </strong>
               <button
-                className="ci-remove"
+                className="grid h-[26px] w-[26px] shrink-0 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-strong active:scale-90"
                 onClick={() => onRemove(item.id)}
                 aria-label="Remove"
                 title="Remove"
               >
-                <Icon name="x" />
+                <Icon name="x" className="h-3.5 w-3.5" />
               </button>
             </div>
           ))
         ) : (
-          <div className="cart-empty">
-            <Icon name="cart" />
-            <p>
+          <div className="flex flex-col items-center gap-2 py-5 text-center text-faint">
+            <Icon name="cart" className="h-[34px] w-[34px] opacity-55" />
+            <p className="text-[0.9rem]">
               Your cart is empty.
               <br />
               Add something tasty from the menu.
@@ -317,14 +432,13 @@ function CartPanel({ cart, onAdd, onChangeQty, onRemove, onPlaceOrder }) {
           </div>
         )}
       </div>
-      <div className="cart-summary">
-        <div className="summary-row total">
+      <div className="mt-3.5 flex flex-col gap-3 border-t border-gray-200 pt-3.5">
+        <div className="flex items-center justify-between text-[1.15rem] font-extrabold">
           <span>Total</span>
-          <strong id="total">{formatSAR(total)}</strong>
+          <strong>{formatSAR(total)}</strong>
         </div>
         <button
-          id="placeOrderBtn"
-          className="btn btn-primary"
+          className="flex items-center justify-center gap-2 rounded-[10px] bg-gradient-to-b from-amber-400 to-brand px-4 py-2.5 font-semibold text-white shadow-sm transition hover:brightness-105 disabled:cursor-not-allowed disabled:opacity-50"
           disabled={!cart.length}
           onClick={onPlaceOrder}
         >
@@ -335,39 +449,52 @@ function CartPanel({ cart, onAdd, onChangeQty, onRemove, onPlaceOrder }) {
   );
 }
 
-function MyOrders({ table }) {
+function MyOrders({ table, sessionId }) {
   const { data } = useDb();
-  const orders = (data.orders || [])
-    .filter((o) => String(o.table) === String(table))
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  const orders = ordersForSession(data.orders, table, sessionId).sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  );
 
   if (!orders.length) return null;
 
   return (
-    <section className="card my-orders-panel">
-      <div className="panel-head">
-        <h2>
-          <Icon name="receipt" />
+    <section
+      className={`mt-5 rounded-2xl border border-gray-200 bg-white p-5 ${SHADOW}`}
+    >
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <h2 className="flex items-center gap-2 text-[1.05rem] font-bold">
+          <Icon name="receipt" className="h-4 w-4" />
           My Orders
         </h2>
-        <span className="muted">
+        <span className="text-[0.9rem] text-muted">
           {orders.length === 1 ? "1 order" : `${orders.length} orders`}
         </span>
       </div>
-      <div className="list">
+      <div className="flex flex-col gap-2.5">
         {orders.map((order) => (
-          <div className="order-row" key={order.id}>
-            <div className="order-main">
-              <div className="order-table-chip">#{order.id}</div>
-              <div className="order-info">
-                <strong>Order #{order.id}</strong>
-                <small>{itemsText(order.items, " · ")}</small>
-                <span className="time-ago">{timeAgo(order.createdAt)}</span>
+          <div
+            className="flex items-center justify-between gap-3.5 rounded-[14px] border border-gray-200 bg-white px-4 py-3.5"
+            key={order.id}
+          >
+            <div className="flex min-w-0 items-center gap-3.5">
+              <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-neutral-900 text-[0.95rem] font-extrabold text-brand">
+                #{order.id}
+              </div>
+              <div className="min-w-0">
+                <strong className="text-[0.95rem]">Order #{order.id}</strong>
+                <small className="mt-0.5 block truncate text-muted">
+                  {itemsText(order.items, " · ")}
+                </small>
+                <span className="text-[0.8rem] text-faint">
+                  {timeAgo(order.createdAt)}
+                </span>
               </div>
             </div>
-            <div className="order-meta">
+            <div className="flex shrink-0 items-center gap-3.5">
               <StatusBadge status={order.status} />
-              <strong className="order-total">{formatSAR(order.total)}</strong>
+              <strong className="whitespace-nowrap font-extrabold">
+                {formatSAR(order.total)}
+              </strong>
             </div>
           </div>
         ))}
@@ -383,6 +510,7 @@ export default function CustomerMenu() {
   const { toast } = useUi();
   const [cart, setCart] = useState([]);
   const trackRef = useRef(null);
+  const session = useMemo(() => getSession(table), [table]);
 
   const addToCart = (foodId) => {
     const food = (data.foods || []).find((f) => f.id === foodId);
@@ -420,6 +548,7 @@ export default function CustomerMenu() {
     const order = {
       id: Date.now(),
       table,
+      sessionId: session.id,
       items: cart.map((i) => ({
         id: i.id,
         name: i.name,
@@ -442,22 +571,24 @@ export default function CustomerMenu() {
   };
 
   return (
-    <div className="app-shell customer-page">
-      <Hero table={table} />
-      <div ref={trackRef}>
-        <TrackPanel table={table} />
+    <div className="min-h-screen bg-neutral-100 px-6 py-6 max-sm:px-3.5 max-sm:py-3.5">
+      <div className="mx-auto max-w-[1180px]">
+        <Hero table={table} />
+        <div ref={trackRef}>
+          <TrackPanel table={table} sessionId={session.id} />
+        </div>
+        <main className="mt-5 grid grid-cols-[2fr_1fr] items-start gap-5 max-lg:grid-cols-1">
+          <MenuPanel cart={cart} onAdd={addToCart} onChangeQty={changeQty} />
+          <CartPanel
+            cart={cart}
+            onAdd={addToCart}
+            onChangeQty={changeQty}
+            onRemove={removeFromCart}
+            onPlaceOrder={placeOrder}
+          />
+        </main>
+        <MyOrders table={table} sessionId={session.id} />
       </div>
-      <main className="customer-layout">
-        <MenuPanel cart={cart} onAdd={addToCart} onChangeQty={changeQty} />
-        <CartPanel
-          cart={cart}
-          onAdd={addToCart}
-          onChangeQty={changeQty}
-          onRemove={removeFromCart}
-          onPlaceOrder={placeOrder}
-        />
-      </main>
-      <MyOrders table={table} />
     </div>
   );
 }

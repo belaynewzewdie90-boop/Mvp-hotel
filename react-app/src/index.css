@@ -1,0 +1,26 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #f97316;
+  --color-brand-strong: #ea580c;
+  --color-brand-soft: #fff3e0;
+  --color-brand-ink: #7c2d12;
+  --color-peach: #ffdfc2;
+  --color-ink: #111111;
+  --color-muted: #5b5b5b;
+  --color-faint: #c9c9c9;
+  --color-surface-2: #f3f3f3;
+
+  --animate-track-in: track-in 0.35s ease;
+}
+
+@keyframes track-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

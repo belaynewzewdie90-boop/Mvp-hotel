@@ -32,72 +32,73 @@ export default function Login() {
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <div className="brand-mark">
-          <Icon name="lock" />
+    <div className="grid min-h-screen place-items-center bg-[radial-gradient(1200px_600px_at_10%_-10%,rgba(251,153,28,0.16),transparent_60%),radial-gradient(1000px_500px_at_110%_110%,rgba(28,118,144,0.12),transparent_55%),#f8f8f8] px-6 py-6">
+      <div className="w-full max-w-[420px] rounded-2xl border border-gray-200 bg-white p-8 shadow-[0_6px_16px_-6px_rgba(17,17,17,0.12)]">
+        <div className="mb-4 grid h-[52px] w-[52px] place-items-center rounded-[14px] bg-gradient-to-br from-brand to-brand-strong text-white shadow-[0_6px_16px_-6px_rgba(17,17,17,0.12)]">
+          <Icon name="lock" className="h-6 w-6" />
         </div>
-        <h1>Staff Login</h1>
-        <p className="sub">Sign in to access the management dashboards.</p>
+        <h1 className="mb-1 text-[1.4rem] font-bold tracking-tight text-ink">
+          Staff Login
+        </h1>
+        <p className="mb-5 text-[0.92rem] text-muted">
+          Sign in to access the management dashboards.
+        </p>
 
         {error && (
-          <div className="form-error">
-            <Icon name="alert" />
+          <div className="mb-3 flex items-center gap-2 rounded-[10px] bg-red-100 px-3 py-2.5 text-[0.88rem] font-semibold text-red-700">
+            <Icon name="alert" className="h-4 w-4 shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        <form className="stack-form" style={{ flexDirection: "column" }} onSubmit={handleSubmit} noValidate>
-          <label style={{ width: "100%", display: "block" }}>
-            <span className="field-label">Username</span>
+        <form className="flex flex-col gap-2.5" onSubmit={handleSubmit} noValidate>
+          <label className="block w-full">
+            <span className="mb-1.5 block text-[0.8rem] font-semibold uppercase tracking-[0.05em] text-muted">
+              Username
+            </span>
             <input
-              className="input"
+              className="w-full rounded-[10px] border border-gray-300 bg-surface-2 px-3 py-2.5 text-ink transition focus:border-brand focus:bg-white focus:shadow-[0_0_0_3px_rgba(251,153,28,0.18)] focus:outline-none"
               placeholder="e.g. admin"
               autoComplete="username"
               required
-              style={{ width: "100%" }}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
             />
           </label>
-          <label style={{ width: "100%", display: "block" }}>
-            <span className="field-label">Password</span>
-            <div style={{ position: "relative" }}>
+          <label className="block w-full">
+            <span className="mb-1.5 block text-[0.8rem] font-semibold uppercase tracking-[0.05em] text-muted">
+              Password
+            </span>
+            <div className="relative">
               <input
-                className="input"
+                className="w-full rounded-[10px] border border-gray-300 bg-surface-2 px-3 py-2.5 pr-11 text-ink transition focus:border-brand focus:bg-white focus:shadow-[0_0_0_3px_rgba(251,153,28,0.18)] focus:outline-none"
                 type={showPass ? "text" : "password"}
                 placeholder="••••••••"
                 autoComplete="current-password"
                 required
-                style={{ width: "100%", paddingRight: 44 }}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
               <button
                 type="button"
-                className="btn btn-ghost"
+                className="absolute right-1.5 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-muted transition hover:bg-surface-2 hover:text-ink"
                 aria-label="Show password"
                 onClick={() => setShowPass((s) => !s)}
-                style={{
-                  position: "absolute",
-                  right: 6,
-                  top: "50%",
-                  transform: "translateY(-50%)",
-                  padding: 6,
-                  borderRadius: 8,
-                }}
               >
-                <Icon name={showPass ? "eyeOff" : "eye"} />
+                <Icon name={showPass ? "eyeOff" : "eye"} className="h-4 w-4" />
               </button>
             </div>
           </label>
-          <button type="submit" className="btn btn-primary" style={{ width: "100%", justifyContent: "center" }}>
-            <Icon name="external" />
+          <button
+            type="submit"
+            className="mt-1 flex w-full items-center justify-center gap-2 rounded-[10px] bg-gradient-to-b from-amber-400 to-brand px-4 py-2.5 font-semibold text-white shadow-sm transition hover:brightness-105"
+          >
+            <Icon name="external" className="h-4 w-4" />
             Sign in
           </button>
         </form>
 
-        <div className="auth-hint">
+        <div className="mt-4 rounded-[10px] bg-brand-soft px-3.5 py-3 text-[0.85rem] leading-relaxed text-brand-ink">
           <strong>Demo credentials</strong>
           <br />
           Admin — <code>admin</code> / <code>admin123</code>
@@ -105,8 +106,10 @@ export default function Login() {
           Kitchen — <code>kitchen</code> / <code>kitchen123</code>
         </div>
 
-        <p className="muted" style={{ textAlign: "center", marginTop: 16 }}>
-          <Link to="/">← Back to customer menu</Link>
+        <p className="mt-4 text-center text-[0.9rem] text-muted">
+          <Link className="hover:text-brand" to="/">
+            ← Back to customer menu
+          </Link>
         </p>
       </div>
     </div>
